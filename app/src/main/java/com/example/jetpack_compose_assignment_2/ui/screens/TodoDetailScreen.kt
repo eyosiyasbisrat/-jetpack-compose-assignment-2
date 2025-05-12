@@ -14,6 +14,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.jetpack_compose_assignment_2.ui.viewmodel.TodoDetailUiState
 import com.example.jetpack_compose_assignment_2.ui.viewmodel.TodoDetailViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TodoDetailScreen(
     onNavigateBack: () -> Unit,
@@ -23,7 +24,7 @@ fun TodoDetailScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
+            CenterAlignedTopAppBar(
                 title = { Text("Todo Details") },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {

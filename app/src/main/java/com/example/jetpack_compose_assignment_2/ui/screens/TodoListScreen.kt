@@ -4,6 +4,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -16,6 +18,7 @@ import com.example.jetpack_compose_assignment_2.data.model.Todo
 import com.example.jetpack_compose_assignment_2.ui.viewmodel.TodoListUiState
 import com.example.jetpack_compose_assignment_2.ui.viewmodel.TodoListViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TodoListScreen(
     onTodoClick: (Int) -> Unit,
@@ -25,7 +28,7 @@ fun TodoListScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
+            CenterAlignedTopAppBar(
                 title = { Text("Todo List") },
                 actions = {
                     IconButton(onClick = { viewModel.refreshTodos() }) {

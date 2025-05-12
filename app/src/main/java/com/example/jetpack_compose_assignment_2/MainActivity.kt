@@ -11,6 +11,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.jetpack_compose_assignment_2.ui.navigation.NavGraph
 import com.example.jetpack_compose_assignment_2.ui.theme.JetpackComposeAssignment2Theme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.emitAll
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
