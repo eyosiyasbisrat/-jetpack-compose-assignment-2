@@ -26,7 +26,7 @@ import com.example.jetpack_compose_assignment_2.ui.viewmodel.TodoListViewModel
 @Composable
 fun TodoListScreen(
     onTodoClick: (Int) -> Unit,
-    viewModel: TodoListViewModel = hiltViewModel()
+    viewModel: TodoListViewModel = hiltViewModel()  
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var showAddDialog by remember { mutableStateOf(false) }
