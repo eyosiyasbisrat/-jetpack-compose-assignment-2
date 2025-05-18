@@ -20,13 +20,16 @@ class TodoListViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<TodoListUiState>(TodoListUiState.Loading)
     val uiState: StateFlow<TodoListUiState> = _uiState
 
+    private val _completedTodos = MutableStateFlow<List<Todo>>(emptyList())
+    val completedTodos: StateFlow<List<Todo>> = _completedTodos
+
     init {
         loadTodos()
     }
 
     private fun loadTodos() {
         viewModelScope.launch {
-            repository.getTodos()
+            repository.getActiveTodos()
                 .catch { e ->
                     _uiState.value = TodoListUiState.Error(e.message ?: "Unknown error occurred")
                 }
@@ -36,6 +39,13 @@ class TodoListViewModel @Inject constructor(
                     } else {
                         _uiState.value = TodoListUiState.Success(todos)
                     }
+                }
+        }
+
+        viewModelScope.launch {
+            repository.getCompletedTodos()
+                .collectLatest { completed ->
+                    _completedTodos.value = completed
                 }
         }
     }
