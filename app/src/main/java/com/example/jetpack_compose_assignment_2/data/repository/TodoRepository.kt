@@ -16,9 +16,11 @@ class TodoRepository @Inject constructor(
 
     suspend fun refreshTodos() {
         try {
-            val freshTodos = todoApi.getTodos()
+            // Instead of fetching from API, we'll just remove completed todos
+            val todos = todoDao.getAllTodos().first()
+            val incompleteTodos = todos.filter { !it.completed }
             todoDao.deleteAllTodos()
-            todoDao.insertTodos(freshTodos)
+            todoDao.insertTodos(incompleteTodos)
         } catch (e: Exception) {
             e.printStackTrace()
         }
