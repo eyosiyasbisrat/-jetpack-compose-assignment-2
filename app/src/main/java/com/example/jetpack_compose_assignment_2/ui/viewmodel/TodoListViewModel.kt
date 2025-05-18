@@ -22,7 +22,6 @@ class TodoListViewModel @Inject constructor(
 
     init {
         loadTodos()
-        refreshTodos()
     }
 
     private fun loadTodos() {
