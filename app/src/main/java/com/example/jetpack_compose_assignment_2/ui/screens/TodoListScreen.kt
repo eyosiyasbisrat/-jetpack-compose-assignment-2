@@ -5,11 +5,15 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -25,6 +29,7 @@ fun TodoListScreen(
     viewModel: TodoListViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    var showAddDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -39,6 +44,16 @@ fun TodoListScreen(
                     }
                 }
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { showAddDialog = true }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Add Todo"
+                )
+            }
         }
     ) { paddingValues ->
         Box(
@@ -62,10 +77,20 @@ fun TodoListScreen(
                         items(todos) { todo ->
                             TodoItem(
                                 todo = todo,
-                                onClick = { onTodoClick(todo.id) }
+                                onClick = { onTodoClick(todo.id) },
+                                onCheckedChange = { completed ->
+                                    viewModel.updateTodoCompletion(todo.id, completed)
+                                }
                             )
                         }
                     }
+                }
+                is TodoListUiState.Empty -> {
+                    Text(
+                        text = "No todos found.",
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
                 }
                 is TodoListUiState.Error -> {
                     val error = (uiState as TodoListUiState.Error).message
@@ -90,12 +115,23 @@ fun TodoListScreen(
             }
         }
     }
+
+    if (showAddDialog) {
+        AddTodoDialog(
+            onDismiss = { showAddDialog = false },
+            onConfirm = { title ->
+                viewModel.addTodo(title)
+                showAddDialog = false
+            }
+        )
+    }
 }
 
 @Composable
 fun TodoItem(
     todo: Todo,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onCheckedChange: (Boolean) -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -116,8 +152,42 @@ fun TodoItem(
             )
             Checkbox(
                 checked = todo.completed,
-                onCheckedChange = null
+                onCheckedChange = onCheckedChange
             )
         }
     }
+}
+
+@Composable
+fun AddTodoDialog(
+    onDismiss: () -> Unit,
+    onConfirm: (String) -> Unit
+) {
+    var title by remember { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Add New Todo") },
+        text = {
+            OutlinedTextField(
+                value = title,
+                onValueChange = { title = it },
+                label = { Text("Todo Title") },
+                singleLine = true
+            )
+        },
+        confirmButton = {
+            TextButton(
+                onClick = { onConfirm(title) },
+                enabled = title.isNotBlank()
+            ) {
+                Text("Add")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    )
 } 
