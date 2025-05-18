@@ -27,4 +27,8 @@ object DatabaseModule {
     fun provideTodoDao(database: TodoDatabase): TodoDao {
         return database.todoDao()
     }
+
+    @Provides
+    @Singleton
+    fun provideAppContext(@ApplicationContext context: Context): Context = context
 } 
