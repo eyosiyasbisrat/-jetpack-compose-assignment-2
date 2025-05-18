@@ -29,7 +29,7 @@ class TodoListViewModel @Inject constructor(
 
     private fun loadTodos() {
         viewModelScope.launch {
-            repository.getActiveTodos()
+            repository.getTodos()
                 .catch { e ->
                     _uiState.value = TodoListUiState.Error(e.message ?: "Unknown error occurred")
                 }

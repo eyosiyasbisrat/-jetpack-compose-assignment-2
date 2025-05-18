@@ -1,21 +1,37 @@
 package com.example.jetpack_compose_assignment_2.data.repository
 
+import android.content.Context
+import android.content.SharedPreferences
 import com.example.jetpack_compose_assignment_2.data.local.TodoDao
 import com.example.jetpack_compose_assignment_2.data.model.Todo
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class TodoRepository @Inject constructor(
-    private val todoDao: TodoDao
+    private val todoDao: TodoDao,
+    @ApplicationContext private val context: Context
 ) {
-    fun getActiveTodos(): Flow<List<Todo>> = 
-        todoDao.getAllTodos().map { todos -> todos.filter { !it.completed } }
+    init {
+        clearDbOnFirstLaunch()
+    }
 
-    fun getCompletedTodos(): Flow<List<Todo>> = 
+    private fun clearDbOnFirstLaunch() {
+        val prefs: SharedPreferences = context.getSharedPreferences("todo_prefs", Context.MODE_PRIVATE)
+        if (!prefs.getBoolean("db_cleared", false)) {
+            runBlocking { todoDao.deleteAllTodos() }
+            prefs.edit().putBoolean("db_cleared", true).apply()
+        }
+    }
+
+    fun getTodos(): Flow<List<Todo>> = todoDao.getAllTodos()
+
+    fun getCompletedTodos(): Flow<List<Todo>> =
         todoDao.getAllTodos().map { todos -> todos.filter { it.completed } }
 
     suspend fun refreshTodos() {
